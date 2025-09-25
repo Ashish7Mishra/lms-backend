@@ -1,10 +1,11 @@
 const express = require("express");
-const { createLesson, getLessonsByCourse } = require("../controllers/lessonController");
-const { protect, isInstructor } = require("../middleware/authMiddleware");
+const {updateLesson,deleteLesson} = require('../controllers/lessonController');const { protect, isInstructor } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.post("/", protect, isInstructor, createLesson);
-router.get("/:courseId", protect, getLessonsByCourse);
+router
+  .route('/:lessonId')
+  .put(protect, isInstructor, updateLesson)
+  .delete(protect, isInstructor, deleteLesson);
 
 module.exports = router;

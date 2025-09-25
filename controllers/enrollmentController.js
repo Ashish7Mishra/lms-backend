@@ -30,7 +30,7 @@ const enrollInCourse = async (req, res) => {
 // Get all enrolled courses for a student
 const getMyEnrollments = async (req, res) => {
   try {
-    const enrollments = await Enrollment.find({ student: req.user._id }).populate("course");
+    const enrollments = await Enrollment.find({ student: req.user._id }).populate("course","'title description category imageUrl'");
     res.status(200).json(enrollments);
   } catch (error) {
     console.error(error);
