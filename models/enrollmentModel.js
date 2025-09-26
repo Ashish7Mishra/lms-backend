@@ -12,6 +12,16 @@ const enrollmentSchema = mongoose.Schema(
       ref: "Course",
       required: true,
     },
+    completedLessons: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Lesson",
+        }
+      ],
+      default: [],
+    }
+
   },
   { timestamps: true }
 );

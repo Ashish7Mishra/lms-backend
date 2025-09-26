@@ -1,5 +1,6 @@
 const Enrollment = require("../models/enrollmentModel");
 const Course = require("../models/courseModel");
+const Lesson = require('../models/lessonModel');
 
 // Enroll in a course
 const enrollInCourse = async (req, res) => {
@@ -30,7 +31,7 @@ const enrollInCourse = async (req, res) => {
 // Get all enrolled courses for a student
 const getMyEnrollments = async (req, res) => {
   try {
-    const enrollments = await Enrollment.find({ student: req.user._id }).populate("course","'title description category imageUrl'");
+    const enrollments = await Enrollment.find({ student: req.user._id }).populate("course", "'title description category imageUrl'");
     res.status(200).json(enrollments);
   } catch (error) {
     console.error(error);
@@ -38,4 +39,40 @@ const getMyEnrollments = async (req, res) => {
   }
 };
 
-module.exports = { enrollInCourse, getMyEnrollments };
+
+const markLessonAsComplete = async (req, res) => {
+
+  try {
+
+    const { lessonId } = req.body;
+    const studentId = req.user._id;
+
+    const lesson = await Lesson.findById(lessonId);
+    if (!lesson) {
+      return res.status(404).json({ message: 'Lesson not found' });
+    }
+
+    const enrollment = await Enrollment.findOne({
+      student: studentId,
+      course: lesson.course,
+    })
+
+    if (!enrollment) {
+      return res.status(404).json({ message: 'You are not enrolled in this course' });
+    }
+
+    await Enrollment.updateOne(
+      { _id: enrollment._id },
+      { $addToSet: { completedLessons: lessonId } }
+    );
+    res.status(200).json({ message: 'Lesson marked as complete' });
+
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+
+}
+
+module.exports = { enrollInCourse, getMyEnrollments, markLessonAsComplete };
